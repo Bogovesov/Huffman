@@ -3,13 +3,24 @@ package com.company;
 import java.util.*;
 
 public class CustomHuffman implements Comparable<CustomHuffman> {
+    /**
+     * Корень дерева
+     */
     private Node root;
 
-    public CustomHuffman(Node root) {
+    private CustomHuffman(Node root) {
         this.root = root;
     }
 
-    public static void buildTree(List<String> strings) {
+    /**
+     * Построение дерева Хаффмана
+     * @param strings
+     * @return дерево Хаффмана
+     */
+    public static CustomHuffman buildTree(List<String> strings) {
+        /**
+         * Формирования таблицы повторяемости символов
+         */
         Map<Character, Integer> map = new HashMap();
         for (String string : strings) {
             for (int i = 0; i < string.length(); i++) {
@@ -24,23 +35,80 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
             }
         }
 
-        Queue<CustomHuffman> customHuffmanQueue = new PriorityQueue<CustomHuffman>();
+        /**
+         * Заполнение очереди символов и их количество повторяимости
+         */
+        Queue<CustomHuffman> huffmanQueue = new PriorityQueue<CustomHuffman>();
         for (Map.Entry<Character, Integer> entry : map.entrySet()) {
-            customHuffmanQueue.offer(new CustomHuffman(new Node(entry.getValue(), entry.getKey())));
+            huffmanQueue.offer(new CustomHuffman(new Node(entry.getValue(), entry.getKey())));
         }
 
-        while (customHuffmanQueue.size() != 1) {
-            CustomHuffman chilLeft = customHuffmanQueue.poll();
-            CustomHuffman childRight = customHuffmanQueue.poll();
-            customHuffmanQueue.offer(new CustomHuffman(new Node(chilLeft, childRight)));
+        /**
+         * Формирование дерева
+         */
+        while (huffmanQueue.size() != 1) {
+            CustomHuffman childLeft = huffmanQueue.poll();
+            CustomHuffman childRight = huffmanQueue.poll();
+            huffmanQueue.offer(new CustomHuffman(new Node(childLeft, childRight)));
         }
+        return huffmanQueue.poll();
     }
 
+    /**
+     * Формирование закодированной строки
+     * @param text Входная строка
+     * @return Закодированнная строка
+     */
+    public String code(String text) {
+        Map<Character, String> codes = codeTable();
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < text.length(); i++) {
+            Character key = text.charAt(i);
+            if (codes.containsKey(key)) {
+                result.append(codes.get(key));
+                System.out.println("[" + key + "] ----> " + "[" + codes.get(key) + "]");
+            }
+        }
+        return result.toString();
+    }
+
+    /**
+     * Формирование кодовой таблицы
+     * @return
+     */
+    private Map<Character, String> codeTable() {
+        Map<Character, String> codeTable = new HashMap();
+        codeTable(root, new StringBuilder(), codeTable);
+        return codeTable;
+    }
+
+    private void codeTable(Node node, StringBuilder code, Map<Character, String> codeTable) {
+        if (node.character != null) {
+            codeTable.put(node.character, code.toString());
+            System.out.println("char[" + node.character + "] ----> code[" + code.toString() + "]");
+            return;
+        }
+        codeTable(node.left, code.append('0'), codeTable);
+        code.deleteCharAt(code.length() - 1);
+        codeTable(node.right, code.append('1'), codeTable);
+        code.deleteCharAt(code.length() - 1);
+    }
+
+
+    /**
+     * Для сортировки очереди по еобходимому признаку
+     * @param tree
+     * @return
+     */
     @Override
     public int compareTo(CustomHuffman tree) {
         return root.frequency - tree.root.frequency;
     }
 
+    /**
+     * Обьекты узлов
+     */
     private static class Node {
         private Integer frequency;
         private Character character;
