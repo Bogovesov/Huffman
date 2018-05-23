@@ -25,9 +25,6 @@ public class Compressor extends CustomFile {
             buf = (char) (buf | (((inputString.charAt(i) == '1') ? 1 : 0) << (7 - count)));
             count++;
             if ((count == 8) || (i == inputString.length() - 1)) {
-                if (count != 8) {
-                    buf = (char) (buf >> (8 - count));
-                }
                 result += buf;
                 buf = '\u0000';
                 count = 0;
