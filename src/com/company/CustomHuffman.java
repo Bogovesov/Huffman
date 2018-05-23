@@ -45,6 +45,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
 
         /**
          * Формирование дерева
+         * В последнем элементе будет корень дерева, который содержит ссылки на своих потомков
          */
         while (huffmanQueue.size() != 1) {
             CustomHuffman childLeft = huffmanQueue.poll();
@@ -67,7 +68,6 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
             Character key = text.charAt(i);
             if (codes.containsKey(key)) {
                 result.append(codes.get(key));
-                System.out.println("[" + key + "] ----> " + "[" + codes.get(key) + "]");
             }
         }
         return result.toString();
@@ -97,7 +97,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
 
 
     /**
-     * Для сортировки очереди по еобходимому признаку
+     * Для сортировки очереди по необходимому признаку
      * @param tree
      * @return
      */

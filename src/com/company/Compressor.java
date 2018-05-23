@@ -8,14 +8,39 @@ public class Compressor extends CustomFile {
     public void compress(String fileName) throws IOException {
         List<String> strings = super.read(fileName);
 
-        CustomHuffman customHuffman = CustomHuffman.buildTree(strings);
-        String result = customHuffman.code(strings.get(0));
+        String codeString = CustomHuffman.buildTree(strings).code(getStringByList(strings));
 
-        //TODO разбить на биты
-        List<String> stringList = new ArrayList<>();
-        stringList.add(result);
-
-        super.save(fileName + ".compressed", stringList);
+        super.save(fileName + ".compressed", parseToByte(codeString));
     }
 
+    /**
+     * Разбиение входной строки побайтно
+     */
+    private List<String> parseToByte(String inputString) {
+        List<String> stringList = new ArrayList<>();
+
+        int count = 0;
+        char buf = '\u0000';
+        String result = "";
+
+        for (int i = 0; i < inputString.length(); i++) {
+            buf = (char) (buf | (((inputString.charAt(i) == '1') ? 1 : 0) << (7 - count)));
+            count++;
+            if (count == 8) {
+                result += buf;
+                buf = '\u0000';
+                count = 0;
+            }
+        }
+        stringList.add(result);
+        return stringList;
+    }
+
+    private String getStringByList(List<String> strings) {
+        String resultStr = "";
+        for (String string : strings) {
+            resultStr += string;
+        }
+        return resultStr;
+    }
 }
