@@ -7,14 +7,12 @@ public class Compressor extends CustomFile {
 
     public void compress(String fileName) throws IOException {
         List<String> strings = super.read(fileName);
-
         String codeString = CustomHuffman.buildTree(strings).code(getStringByList(strings));
-
         super.save(fileName + ".compressed", parseToByte(codeString));
     }
 
     /**
-     * Разбиение входной строки побайтно
+     * Разбиение закодированной строки побайтно
      */
     private List<String> parseToByte(String inputString) {
         List<String> stringList = new ArrayList<>();
