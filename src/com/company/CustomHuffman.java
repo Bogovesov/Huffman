@@ -14,6 +14,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
 
     /**
      * Построение дерева Хаффмана
+     *
      * @param strings
      * @return дерево Хаффмана
      */
@@ -56,7 +57,36 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
     }
 
     /**
+     * Декодирование строки
+     *
+     * @param text
+     * @return
+     */
+    public String decode(String text) {
+        String result = "";
+        Node node = root;
+        char buf = '\u0000';
+
+        for (int i = 0; i < text.length(); i++) {
+            buf = text.charAt(i);
+            for (int j = 0; j < 8; j++) {
+                if ((buf & (1 << (7 - j))) != 0) {
+                    node = node.right;
+                } else {
+                    node = node.left;
+                }
+                if ((node.left == null) && (node.right == null)) {
+                    result += node.character;
+                    node = root;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Формирование закодированной строки
+     *
      * @param text Входная строка
      * @return Закодированнная строка
      */
@@ -75,6 +105,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
 
     /**
      * Формирование кодовой таблицы
+     *
      * @return
      */
     private Map<Character, String> codeTable() {
@@ -98,6 +129,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
 
     /**
      * Для сортировки очереди по необходимому признаку
+     *
      * @param tree
      * @return
      */

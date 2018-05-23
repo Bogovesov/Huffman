@@ -24,7 +24,10 @@ public class Compressor extends CustomFile {
         for (int i = 0; i < inputString.length(); i++) {
             buf = (char) (buf | (((inputString.charAt(i) == '1') ? 1 : 0) << (7 - count)));
             count++;
-            if (count == 8) {
+            if ((count == 8) || (i == inputString.length() - 1)) {
+                if (count != 8) {
+                    buf = (char) (buf >> (8 - count));
+                }
                 result += buf;
                 buf = '\u0000';
                 count = 0;
@@ -32,13 +35,5 @@ public class Compressor extends CustomFile {
         }
         stringList.add(result);
         return stringList;
-    }
-
-    private String getStringByList(List<String> strings) {
-        String resultStr = "";
-        for (String string : strings) {
-            resultStr += string;
-        }
-        return resultStr;
     }
 }

@@ -29,4 +29,12 @@ public abstract class CustomFile {
             throw new IllegalArgumentException();
         }
     }
+
+    protected String getStringByList(List<String> strings) {
+        String resultStr = "";
+        for (String string : strings) {
+            resultStr += string;
+        }
+        return resultStr;
+    }
 }

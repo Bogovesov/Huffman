@@ -1,13 +1,20 @@
 package com.company;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Decompressor extends CustomFile {
 
-    public void decompress(String fileName) throws IOException {
-        List<String> strings = super.read(fileName);
+    public void decompress(String sourceFile, String fileName) throws IOException {
+        List<String> stringsSource = super.read(sourceFile);
+        List<String> stringCompressed = super.read(fileName);
 
-        super.save(fileName + ".decompressed", strings);
+        String decodeString = CustomHuffman.buildTree(stringsSource).decode(getStringByList(stringCompressed));
+
+        List<String> stringList = new ArrayList<>();
+        stringList.add(decodeString);
+
+        super.save(fileName + ".decompressed", stringList);
     }
 }
