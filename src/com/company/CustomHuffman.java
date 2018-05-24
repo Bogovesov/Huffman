@@ -62,7 +62,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * @param text
      * @return
      */
-    public String decode(String text) {
+    public String decode(String text, int sizeSourceString) {
         String result = "";
         Node node = root;
         char buf = '\u0000';
@@ -77,6 +77,9 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
                 }
                 if ((node.left == null) && (node.right == null)) {
                     result += node.character;
+                    if (result.length() == sizeSourceString) {
+                        break;
+                    }
                     node = root;
                 }
             }
