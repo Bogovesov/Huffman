@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CustomFile {
@@ -28,6 +29,12 @@ public abstract class CustomFile {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    protected void save(String fileName, String string) throws IOException {
+        List<String> stringList = new ArrayList<>();
+        stringList.add(string);
+        save(fileName, stringList);
     }
 
     protected String getStringByList(List<String> strings) {

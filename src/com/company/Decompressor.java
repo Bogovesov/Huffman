@@ -10,7 +10,8 @@ public class Decompressor extends CustomFile {
         List<String> stringsSource = super.read(sourceFile);
         List<String> stringCompressed = super.read(fileName);
 
-        String decodeString = CustomHuffman.buildTree(stringsSource).decode(getStringByList(stringCompressed), getStringByList(stringsSource).length());
+        String decodeString = CustomHuffman.buildTree(stringsSource).decode(getStringByList(stringCompressed),
+                getStringByList(stringsSource).length());
 
         System.out.println(decodeString);
 

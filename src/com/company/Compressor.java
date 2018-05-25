@@ -8,6 +8,7 @@ public class Compressor extends CustomFile {
     public void compress(String fileName) throws IOException {
         List<String> strings = super.read(fileName);
         String codeString = CustomHuffman.buildTree(strings).code(getStringByList(strings));
+        super.save(fileName + ".table", codeString);
         super.save(fileName + ".compressed", parseToByte(codeString));
     }
 

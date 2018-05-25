@@ -129,7 +129,6 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
         code.deleteCharAt(code.length() - 1);
     }
 
-
     /**
      * Для сортировки очереди по необходимому признаку
      *

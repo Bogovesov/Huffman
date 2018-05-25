@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    static final String FILE_NAME = "d:" + File.separator + "text.txt";
+    static final String FILE_NAME = "d:" + File.separator + "1.txt";
 
     public static void main(String[] args) {
         try {
