@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CustomFile {
+    public static final String EXT_COMPRESSED = ".compressed";
+    public static final String EXT_DECOMPRESSED = ".decompressed";
+    public static final String EXT_TREE = ".tree";
 
     protected List<String> read(String fileName) throws IOException {
         if (!fileName.isEmpty()) {

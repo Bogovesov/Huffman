@@ -1,12 +1,11 @@
 package com.company;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    static final String FILE_NAME = "d:" + File.separator + "1.txt";
+    static final String FILE_NAME = "d:" + File.separator + "text.txt";
 
     public static void main(String[] args) {
         try {
@@ -18,18 +17,18 @@ public class Main {
             } else {
                 doCompressDecompress(FILE_NAME + ".compressed", false);
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public static void doCompressDecompress(String fileName, boolean compression) throws IOException {
+    public static void doCompressDecompress(String fileName, boolean compression) throws IOException, ClassNotFoundException {
         if (compression) {
             Compressor compressor = new Compressor();
             compressor.compress(fileName);
         } else {
             Decompressor decompressor = new Decompressor();
-            decompressor.decompress(FILE_NAME, fileName);
+            decompressor.decompress(fileName);
         }
     }
 }

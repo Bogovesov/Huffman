@@ -1,5 +1,6 @@
 package com.company;
 
+import java.io.*;
 import java.util.*;
 
 public class CustomHuffman implements Comparable<CustomHuffman> {
@@ -7,6 +8,9 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * Корень дерева
      */
     private Node root;
+
+    private CustomHuffman() {
+    }
 
     private CustomHuffman(Node root) {
         this.root = root;
@@ -19,9 +23,49 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * @return дерево Хаффмана
      */
     public static CustomHuffman buildTree(List<String> strings) {
-        /**
-         * Формирования таблицы повторяемости символов
-         */
+        return buildTree(getMapFrequencyCharacter(strings));
+    }
+
+    /**
+     * Создание дерева из файла
+     *
+     * @param fileNode файл в который был сохранен обьект
+     * @return дерево Хаффмана
+     */
+    public static CustomHuffman buildTree(String fileNode) throws IOException, ClassNotFoundException {
+        FileInputStream fileInputStream = new FileInputStream( fileNode);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        Node root = (Node) objectInputStream.readObject();
+        return new CustomHuffman(root);
+    }
+
+    /**
+     * Формирование дерева
+     * В последнем элементе будет корень дерева, который содержит ссылки на своих потомков
+     *
+     * @param map
+     * @return
+     */
+    public static CustomHuffman buildTree(Map<Character, Integer> map) {
+        Queue<CustomHuffman> huffmanQueue = new PriorityQueue<CustomHuffman>();
+        for (Map.Entry<Character, Integer> entry : map.entrySet()) {
+            huffmanQueue.offer(new CustomHuffman(new Node(entry.getValue(), entry.getKey())));
+        }
+        while (huffmanQueue.size() != 1) {
+            CustomHuffman childLeft = huffmanQueue.poll();
+            CustomHuffman childRight = huffmanQueue.poll();
+            huffmanQueue.offer(new CustomHuffman(new Node(childLeft, childRight)));
+        }
+        return huffmanQueue.poll();
+    }
+
+    /**
+     * Формирования таблицы повторяемости символов
+     *
+     * @param strings
+     * @return
+     */
+    public static Map<Character, Integer> getMapFrequencyCharacter(List<String> strings) {
         Map<Character, Integer> map = new HashMap();
         for (String string : strings) {
             for (int i = 0; i < string.length(); i++) {
@@ -35,25 +79,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
                 }
             }
         }
-
-        /**
-         * Заполнение очереди символов и их количество повторяимости
-         */
-        Queue<CustomHuffman> huffmanQueue = new PriorityQueue<CustomHuffman>();
-        for (Map.Entry<Character, Integer> entry : map.entrySet()) {
-            huffmanQueue.offer(new CustomHuffman(new Node(entry.getValue(), entry.getKey())));
-        }
-
-        /**
-         * Формирование дерева
-         * В последнем элементе будет корень дерева, который содержит ссылки на своих потомков
-         */
-        while (huffmanQueue.size() != 1) {
-            CustomHuffman childLeft = huffmanQueue.poll();
-            CustomHuffman childRight = huffmanQueue.poll();
-            huffmanQueue.offer(new CustomHuffman(new Node(childLeft, childRight)));
-        }
-        return huffmanQueue.poll();
+        return map;
     }
 
     /**
@@ -62,7 +88,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * @param text
      * @return
      */
-    public String decode(String text, int sizeSourceString) {
+    public String decode(String text) {
         String result = "";
         Node node = root;
         char buf = '\u0000';
@@ -77,9 +103,9 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
                 }
                 if ((node.left == null) && (node.right == null)) {
                     result += node.character;
-                    if (result.length() == sizeSourceString) {
-                        break;
-                    }
+//                    if (result.length() == sizeSourceString) {
+//                        break;
+//                    }
                     node = root;
                 }
             }
@@ -141,9 +167,9 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
     }
 
     /**
-     * Обьекты узлов
+     * Обьект узлов
      */
-    private static class Node {
+    private static class Node implements Serializable {
         private Integer frequency;
         private Character character;
         private Node left;
@@ -159,5 +185,9 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
             this.left = left.root;
             this.right = right.root;
         }
+    }
+
+    public Node getRoot() {
+        return root;
     }
 }

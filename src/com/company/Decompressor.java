@@ -1,23 +1,18 @@
 package com.company;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Decompressor extends CustomFile {
 
-    public void decompress(String sourceFile, String fileName) throws IOException {
-        List<String> stringsSource = super.read(sourceFile);
+    public void decompress(String fileName) throws IOException, ClassNotFoundException {
         List<String> stringCompressed = super.read(fileName);
 
-        String decodeString = CustomHuffman.buildTree(stringsSource).decode(getStringByList(stringCompressed),
-                getStringByList(stringsSource).length());
+        String fileNameSource = fileName.replaceAll(EXT_COMPRESSED, "");
+        String decodeString = CustomHuffman.buildTree(fileNameSource + EXT_TREE).decode(getStringByList(stringCompressed));
 
-        System.out.println(decodeString);
-
-        List<String> stringList = new ArrayList<>();
-        stringList.add(decodeString);
-
-        super.save(fileName + ".decompressed", stringList);
+        super.save(fileName + EXT_DECOMPRESSED, decodeString);
     }
 }
