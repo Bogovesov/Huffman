@@ -1,29 +1,35 @@
 package com.company;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
 
-public class Compressor extends CustomFile {
+import static com.company.FileUtils.*;
 
-    public void compress(String fileName) throws IOException {
-        List<String> strings = super.read(fileName);
+public class Compressor {
 
-        CustomHuffman customHuffman = CustomHuffman.buildTree(strings);
-        String codeString = customHuffman.code(getStringByList(strings));
+    private Compressor() {
 
-        saveRootTree(fileName , customHuffman);
-        super.save(fileName + EXT_COMPRESSED, parseToByte(codeString));
+    }
+
+    public static Compressor instance() {
+        return Singelton.INSTANCE.compressor;
+    }
+
+    public void compress(String fileName) {
+        final List<String> inputString = read(fileName);
+        if (inputString.size() > 0) {
+            final HuffmanTree huffmanTree = HuffmanTree.buildTree(inputString);
+            final String codeString = huffmanTree.code(convertListToString(inputString));
+
+            saveMetaData(fileName, huffmanTree);
+            save(fileName + EXT_COMPRESSED, parseToByte(codeString));
+        }
     }
 
     /**
      * Разбиение закодированной строки побайтно
      */
-    private List<String> parseToByte(String inputString) {
-        List<String> stringList = new ArrayList<>();
-
+    private String parseToByte(String inputString) {
         int count = 0;
         char buf = '\u0000';
         String result = "";
@@ -37,16 +43,15 @@ public class Compressor extends CustomFile {
                 count = 0;
             }
         }
-        stringList.add(result);
-        return stringList;
+        return result;
     }
 
-    /**
-     * Правильней было бы придумать другой алгоритм сохранения дерева в файл
-     */
-    private void saveRootTree(String fileName, CustomHuffman customHuffman) throws IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream(fileName + EXT_TREE);
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(customHuffman.getRoot());
+    private enum Singelton {
+        INSTANCE;
+        private Compressor compressor;
+
+        Singelton() {
+            compressor = new Compressor();
+        }
     }
 }

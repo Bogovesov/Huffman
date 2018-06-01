@@ -3,16 +3,16 @@ package com.company;
 import java.io.*;
 import java.util.*;
 
-public class CustomHuffman implements Comparable<CustomHuffman> {
+public class HuffmanTree implements Comparable<HuffmanTree> {
     /**
      * Корень дерева
      */
     private Node root;
 
-    private CustomHuffman() {
+    private HuffmanTree() {
     }
 
-    private CustomHuffman(Node root) {
+    private HuffmanTree(Node root) {
         this.root = root;
     }
 
@@ -22,7 +22,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * @param strings
      * @return дерево Хаффмана
      */
-    public static CustomHuffman buildTree(List<String> strings) {
+    public static HuffmanTree buildTree(List<String> strings) {
         return buildTree(getMapFrequencyCharacter(strings));
     }
 
@@ -32,11 +32,15 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * @param fileNode файл в который был сохранен обьект
      * @return дерево Хаффмана
      */
-    public static CustomHuffman buildTree(String fileNode) throws IOException, ClassNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream( fileNode);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-        Node root = (Node) objectInputStream.readObject();
-        return new CustomHuffman(root);
+    public static HuffmanTree buildTree(String fileNode) {
+        Node root = null;
+        try (FileInputStream fileInputStream = new FileInputStream(fileNode);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            root = (Node) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return new HuffmanTree(root);
     }
 
     /**
@@ -46,15 +50,15 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * @param map
      * @return
      */
-    public static CustomHuffman buildTree(Map<Character, Integer> map) {
-        Queue<CustomHuffman> huffmanQueue = new PriorityQueue<CustomHuffman>();
+    public static HuffmanTree buildTree(Map<Character, Integer> map) {
+        Queue<HuffmanTree> huffmanQueue = new PriorityQueue<HuffmanTree>();
         for (Map.Entry<Character, Integer> entry : map.entrySet()) {
-            huffmanQueue.offer(new CustomHuffman(new Node(entry.getValue(), entry.getKey())));
+            huffmanQueue.offer(new HuffmanTree(new Node(entry.getValue(), entry.getKey())));
         }
         while (huffmanQueue.size() != 1) {
-            CustomHuffman childLeft = huffmanQueue.poll();
-            CustomHuffman childRight = huffmanQueue.poll();
-            huffmanQueue.offer(new CustomHuffman(new Node(childLeft, childRight)));
+            HuffmanTree childLeft = huffmanQueue.poll();
+            HuffmanTree childRight = huffmanQueue.poll();
+            huffmanQueue.offer(new HuffmanTree(new Node(childLeft, childRight)));
         }
         return huffmanQueue.poll();
     }
@@ -146,7 +150,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
     private void codeTable(Node node, StringBuilder code, Map<Character, String> codeTable) {
         if (node.character != null) {
             codeTable.put(node.character, code.toString());
-            System.out.println("char[" + node.character + "] ----> code[" + code.toString() + "]");
+//            System.out.println("char[" + node.character + "] ----> code[" + code.toString() + "]");
             return;
         }
         codeTable(node.left, code.append('0'), codeTable);
@@ -162,7 +166,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
      * @return
      */
     @Override
-    public int compareTo(CustomHuffman tree) {
+    public int compareTo(HuffmanTree tree) {
         return root.frequency - tree.root.frequency;
     }
 
@@ -180,7 +184,7 @@ public class CustomHuffman implements Comparable<CustomHuffman> {
             this.character = character;
         }
 
-        public Node(CustomHuffman left, CustomHuffman right) {
+        public Node(HuffmanTree left, HuffmanTree right) {
             frequency = left.root.frequency + right.root.frequency;
             this.left = left.root;
             this.right = right.root;

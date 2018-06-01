@@ -1,18 +1,39 @@
 package com.company;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class Decompressor extends CustomFile {
+import static com.company.FileUtils.*;
 
-    public void decompress(String fileName) throws IOException, ClassNotFoundException {
-        List<String> stringCompressed = super.read(fileName);
+public class Decompressor {
 
-        String fileNameSource = fileName.replaceAll(EXT_COMPRESSED, "");
-        String decodeString = CustomHuffman.buildTree(fileNameSource + EXT_TREE).decode(getStringByList(stringCompressed));
+    private Decompressor() {
 
-        super.save(fileName + EXT_DECOMPRESSED, decodeString);
+    }
+
+    public static Decompressor instamce() {
+        return Singelton.INSTANCE.decompressor;
+    }
+
+    public void decompress(String fileName) throws UnexpectedFileFormat {
+        final List<String> inputString = read(fileName);
+        if (inputString.size() > 0) {
+            final String fileNameSource = fileName.replaceAll(EXT_COMPRESSED, "");
+            final String decodeString = HuffmanTree.buildTree(fileNameSource + EXT_META).decode(convertListToString(inputString));
+
+            if (!isValidFormat(decodeString)) {
+                throw new UnexpectedFileFormat();
+            }
+            save(fileName + EXT_DECOMPRESSED, decodeString);
+        }
+    }
+
+    private enum Singelton {
+        INSTANCE;
+        private Decompressor decompressor;
+
+        Singelton() {
+            decompressor = new Decompressor();
+        }
     }
 }
