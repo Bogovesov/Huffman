@@ -15,33 +15,30 @@ public class Compressor {
     }
 
     public void compress(String fileName) {
-        final byte[] content = read(fileName);
+        final byte[] content = readBytes(fileName);
         final HuffmanTree huffmanTree = HuffmanTree.buildTree(content);
-        final String codeString = huffmanTree.code(content);
+        final String binaryString = huffmanTree.code(content);
 
-        saveMetaData(fileName, huffmanTree);
-        save(fileName + EXT_COMPRESSED, parseToByte(codeString));
-//        parseToByte(fileName + EXT_COMPRESSED, codeString);
+        Meta.write(fileName + EXT_META, huffmanTree.getFrequency());
+        writeBytes(fileName + EXT_COMPRESSED, splitStringToByte(binaryString));
     }
 
-    /**
-     * Разбиение закодированной строки побайтно
-     */
-    private byte[] parseToByte(String inputString) {
+    private byte[] splitStringToByte(String inputString) {
+        final List<Byte> byteList = new ArrayList<>();
+
         int count = 0;
-        int buf = 0;
-        StringBuilder result = new StringBuilder();
+        char buf = 0;
 
         for (int i = 0; i < inputString.length(); i++) {
-            buf = (buf | (((inputString.charAt(i) == '1') ? 1 : 0) << (7 - count)));
+            buf = (char) (buf | (((inputString.charAt(i) == '1') ? 1 : 0) << (7 - count)));
             count++;
             if ((count == 8) || (i == inputString.length() - 1)) {
-                result.append((char)buf);
+                byteList.add((byte) buf);
                 buf = 0;
                 count = 0;
             }
         }
-        return result.toString().getBytes();
+        return Bytes.valueOf(byteList);
     }
 
     private enum Singelton {

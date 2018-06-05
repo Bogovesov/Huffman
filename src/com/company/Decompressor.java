@@ -1,7 +1,5 @@
 package com.company;
 
-import java.util.List;
-
 import static com.company.FileUtils.*;
 
 public class Decompressor {
@@ -15,15 +13,12 @@ public class Decompressor {
     }
 
     public void decompress(String fileName) throws UnexpectedFileFormat {
-        final byte[] content = read(fileName);
-
-        final String fileNameSource = fileName.replaceAll(EXT_COMPRESSED, "");
-        final String decodeString = HuffmanTree.buildTree(fileNameSource + EXT_META).decode(content);
-
-        if (!isValidFormat(decodeString)) {
+        final byte[] content = readBytes(fileName);
+        final byte[] decodeContent = HuffmanTree.buildTree(Meta.read(fileName)).decode(content);
+        if (!isValidFormat(decodeContent)) {
             throw new UnexpectedFileFormat();
         }
-        save(fileName + EXT_DECOMPRESSED, decodeString);
+        writeBytes(fileName + EXT_DECOMPRESSED, decodeContent);
     }
 
     private enum Singelton {

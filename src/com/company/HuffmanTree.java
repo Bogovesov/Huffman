@@ -1,6 +1,5 @@
 package com.company;
 
-import java.io.*;
 import java.util.*;
 
 public class HuffmanTree implements Comparable<HuffmanTree> {
@@ -8,6 +7,8 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
      * Корень дерева
      */
     private Node root;
+
+    private int[] frequency = new int[255];
 
     private HuffmanTree() {
     }
@@ -19,7 +20,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     /**
      * Построение дерева Хаффмана
      *
-     * @param
      * @return дерево Хаффмана
      */
     public static HuffmanTree buildTree(byte[] content) {
@@ -27,28 +27,8 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     }
 
     /**
-     * Создание дерева из файла
-     *
-     * @param fileNode файл в который был сохранен обьект
-     * @return дерево Хаффмана
-     */
-    public static HuffmanTree buildTree(String fileNode) {
-        Node root = null;
-        try (FileInputStream fileInputStream = new FileInputStream(fileNode);
-             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-            root = (Node) objectInputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return new HuffmanTree(root);
-    }
-
-    /**
      * Формирование дерева
      * В последнем элементе будет корень дерева, который содержит ссылки на своих потомков
-     *
-     * @param
-     * @return
      */
     public static HuffmanTree buildTree(int[] frequency) {
         Queue<HuffmanTree> huffmanQueue = new PriorityQueue<HuffmanTree>();
@@ -62,14 +42,13 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
             HuffmanTree childRight = huffmanQueue.poll();
             huffmanQueue.offer(new HuffmanTree(new Node(childLeft, childRight)));
         }
-        return huffmanQueue.poll();
+        HuffmanTree huffmanTree = huffmanQueue.poll();
+        huffmanTree.setFrequency(frequency);
+        return huffmanTree;
     }
 
     /**
      * Формирования таблицы повторяемости символов
-     *
-     * @param
-     * @return
      */
     public static int[] calculateFrequency(byte[] content) {
         int[] frequency = new int[255];
@@ -80,14 +59,8 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         return frequency;
     }
 
-    /**
-     * Декодирование строки
-     *
-     * @param
-     * @return
-     */
-    public String decode(byte[] content) {
-        String result = "";
+    public byte[] decode(byte[] content) {
+        List<Byte> byteList = new ArrayList<>();
         Node node = root;
         char buf;
 
@@ -100,30 +73,26 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
                     node = node.left;
                 }
                 if (node.isLeaf()) {
-                    result += (char) node.character;
-//                    if (result.length() == sizeSourceString) {
-//                        break;
-//                    }
+                    byteList.add(node.character);
                     node = root;
                 }
             }
         }
-        return result;
+        return Bytes.valueOf(byteList);
     }
 
     /**
      * Формирование закодированной строки
      *
-     * @param
      * @return Закодированнная строка
      */
     public String code(byte[] content) {
-        Map<Byte, String> codes = codeTable();
+        Map<Byte, String> codeTable = codeTable();
         StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < content.length; i++) {
-            if (codes.containsKey(content[i])) {
-                result.append(codes.get(content[i]));
+            if (codeTable.containsKey(content[i])) {
+                result.append(codeTable.get(content[i]));
             }
         }
         return result.toString();
@@ -131,8 +100,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
 
     /**
      * Формирование кодовой таблицы
-     *
-     * @return
      */
     private Map<Byte, String> codeTable() {
         Map<Byte, String> codeTable = new HashMap();
@@ -143,7 +110,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     private void codeTable(Node node, StringBuilder code, Map<Byte, String> codeTable) {
         if (node.isLeaf()) {
             codeTable.put(node.character, code.toString());
-            System.out.println("char[" + node.character + "] ----> code[" + code.toString() + "]");
             return;
         }
         codeTable(node.left, code.append('0'), codeTable);
@@ -154,19 +120,21 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
 
     /**
      * Для сортировки очереди по необходимому признаку
-     *
-     * @param tree
-     * @return
      */
     @Override
     public int compareTo(HuffmanTree tree) {
         return root.frequency - tree.root.frequency;
     }
 
-    /**
-     * Обьект узлов
-     */
-    private static class Node implements Serializable {
+    public void setFrequency(int[] frequency) {
+        this.frequency = frequency;
+    }
+
+    public int[] getFrequency() {
+        return frequency;
+    }
+
+    private static class Node {
         private int frequency;
         private byte character;
         private Node left;
@@ -186,9 +154,5 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         public boolean isLeaf() {
             return (left == null) && (right == null);
         }
-    }
-
-    public Node getRoot() {
-        return root;
     }
 }
