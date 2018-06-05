@@ -1,6 +1,5 @@
 package com.company;
 
-import java.io.IOException;
 import java.util.*;
 
 import static com.company.FileUtils.*;
@@ -16,34 +15,33 @@ public class Compressor {
     }
 
     public void compress(String fileName) {
-        final List<String> inputString = read(fileName);
-        if (inputString.size() > 0) {
-            final HuffmanTree huffmanTree = HuffmanTree.buildTree(inputString);
-            final String codeString = huffmanTree.code(convertListToString(inputString));
+        final byte[] content = read(fileName);
+        final HuffmanTree huffmanTree = HuffmanTree.buildTree(content);
+        final String codeString = huffmanTree.code(content);
 
-            saveMetaData(fileName, huffmanTree);
-            save(fileName + EXT_COMPRESSED, parseToByte(codeString));
-        }
+        saveMetaData(fileName, huffmanTree);
+        save(fileName + EXT_COMPRESSED, parseToByte(codeString));
+//        parseToByte(fileName + EXT_COMPRESSED, codeString);
     }
 
     /**
      * Разбиение закодированной строки побайтно
      */
-    private String parseToByte(String inputString) {
+    private byte[] parseToByte(String inputString) {
         int count = 0;
-        char buf = '\u0000';
-        String result = "";
+        int buf = 0;
+        StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < inputString.length(); i++) {
-            buf = (char) (buf | (((inputString.charAt(i) == '1') ? 1 : 0) << (7 - count)));
+            buf = (buf | (((inputString.charAt(i) == '1') ? 1 : 0) << (7 - count)));
             count++;
             if ((count == 8) || (i == inputString.length() - 1)) {
-                result += buf;
-                buf = '\u0000';
+                result.append((char)buf);
+                buf = 0;
                 count = 0;
             }
         }
-        return result;
+        return result.toString().getBytes();
     }
 
     private enum Singelton {

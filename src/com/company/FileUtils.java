@@ -1,7 +1,6 @@
 package com.company;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +9,7 @@ public class FileUtils {
     public static final String EXT_DECOMPRESSED = ".decompressed";
     public static final String EXT_META = ".meta";
 
-    public static List<String> read(String fileName) {
+  /*  public static List<String> read(String fileName) {
         List<String> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String text;
@@ -21,12 +20,40 @@ public class FileUtils {
             e.printStackTrace();
         }
         return result;
+    }*/
+
+    public static byte[] read(String fileName) {
+        File file = new File(fileName);
+        byte[] content = new byte[0];
+        try (FileInputStream fis = new FileInputStream(file)) {
+            content = new byte[fis.available()];
+            fis.read(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content;
     }
 
     public static void save(String fileName, String text) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             writer.write(text);
             writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void save(String fileName, byte[] content) {
+        try (FileOutputStream fileOuputStream = new FileOutputStream(fileName)) {
+            fileOuputStream.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void save(String fileName, byte content) {
+        try (FileOutputStream fileOuputStream = new FileOutputStream(fileName)) {
+            fileOuputStream.write(content);
         } catch (IOException e) {
             e.printStackTrace();
         }

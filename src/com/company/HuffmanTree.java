@@ -19,11 +19,11 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     /**
      * Построение дерева Хаффмана
      *
-     * @param strings
+     * @param
      * @return дерево Хаффмана
      */
-    public static HuffmanTree buildTree(List<String> strings) {
-        return buildTree(getMapFrequencyCharacter(strings));
+    public static HuffmanTree buildTree(byte[] content) {
+        return buildTree(calculateFrequency(content));
     }
 
     /**
@@ -47,13 +47,15 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
      * Формирование дерева
      * В последнем элементе будет корень дерева, который содержит ссылки на своих потомков
      *
-     * @param map
+     * @param
      * @return
      */
-    public static HuffmanTree buildTree(Map<Character, Integer> map) {
+    public static HuffmanTree buildTree(int[] frequency) {
         Queue<HuffmanTree> huffmanQueue = new PriorityQueue<HuffmanTree>();
-        for (Map.Entry<Character, Integer> entry : map.entrySet()) {
-            huffmanQueue.offer(new HuffmanTree(new Node(entry.getValue(), entry.getKey())));
+        for (int i = 0; i < frequency.length; i++) {
+            if (frequency[i] != 0) {
+                huffmanQueue.offer(new HuffmanTree(new Node(frequency[i], (byte) i)));
+            }
         }
         while (huffmanQueue.size() != 1) {
             HuffmanTree childLeft = huffmanQueue.poll();
@@ -66,47 +68,39 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     /**
      * Формирования таблицы повторяемости символов
      *
-     * @param strings
+     * @param
      * @return
      */
-    public static Map<Character, Integer> getMapFrequencyCharacter(List<String> strings) {
-        Map<Character, Integer> map = new HashMap();
-        for (String string : strings) {
-            for (int i = 0; i < string.length(); i++) {
-                Character key = string.charAt(i);
-                if (map.containsKey(key)) {
-                    Integer pivot = map.get(key);
-                    pivot++;
-                    map.put(key, pivot);
-                } else {
-                    map.put(key, 1);
-                }
-            }
+    public static int[] calculateFrequency(byte[] content) {
+        int[] frequency = new int[255];
+        for (int i = 0; i < content.length; i++) {
+            byte letter = content[i];
+            frequency[letter]++;
         }
-        return map;
+        return frequency;
     }
 
     /**
      * Декодирование строки
      *
-     * @param text
+     * @param
      * @return
      */
-    public String decode(String text) {
+    public String decode(byte[] content) {
         String result = "";
         Node node = root;
-        char buf = '\u0000';
+        char buf;
 
-        for (int i = 0; i < text.length(); i++) {
-            buf = text.charAt(i);
+        for (int i = 0; i < content.length; i++) {
+            buf = (char) content[i];
             for (int j = 0; j < 8; j++) {
                 if ((buf & (1 << (7 - j))) != 0) {
                     node = node.right;
                 } else {
                     node = node.left;
                 }
-                if ((node.left == null) && (node.right == null)) {
-                    result += node.character;
+                if (node.isLeaf()) {
+                    result += (char) node.character;
 //                    if (result.length() == sizeSourceString) {
 //                        break;
 //                    }
@@ -120,17 +114,16 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     /**
      * Формирование закодированной строки
      *
-     * @param text Входная строка
+     * @param
      * @return Закодированнная строка
      */
-    public String code(String text) {
-        Map<Character, String> codes = codeTable();
+    public String code(byte[] content) {
+        Map<Byte, String> codes = codeTable();
         StringBuilder result = new StringBuilder();
 
-        for (int i = 0; i < text.length(); i++) {
-            Character key = text.charAt(i);
-            if (codes.containsKey(key)) {
-                result.append(codes.get(key));
+        for (int i = 0; i < content.length; i++) {
+            if (codes.containsKey(content[i])) {
+                result.append(codes.get(content[i]));
             }
         }
         return result.toString();
@@ -141,16 +134,16 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
      *
      * @return
      */
-    private Map<Character, String> codeTable() {
-        Map<Character, String> codeTable = new HashMap();
+    private Map<Byte, String> codeTable() {
+        Map<Byte, String> codeTable = new HashMap();
         codeTable(root, new StringBuilder(), codeTable);
         return codeTable;
     }
 
-    private void codeTable(Node node, StringBuilder code, Map<Character, String> codeTable) {
-        if (node.character != null) {
+    private void codeTable(Node node, StringBuilder code, Map<Byte, String> codeTable) {
+        if (node.isLeaf()) {
             codeTable.put(node.character, code.toString());
-//            System.out.println("char[" + node.character + "] ----> code[" + code.toString() + "]");
+            System.out.println("char[" + node.character + "] ----> code[" + code.toString() + "]");
             return;
         }
         codeTable(node.left, code.append('0'), codeTable);
@@ -174,12 +167,12 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
      * Обьект узлов
      */
     private static class Node implements Serializable {
-        private Integer frequency;
-        private Character character;
+        private int frequency;
+        private byte character;
         private Node left;
         private Node right;
 
-        public Node(Integer frequency, Character character) {
+        public Node(int frequency, byte character) {
             this.frequency = frequency;
             this.character = character;
         }
@@ -188,6 +181,10 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
             frequency = left.root.frequency + right.root.frequency;
             this.left = left.root;
             this.right = right.root;
+        }
+
+        public boolean isLeaf() {
+            return (left == null) && (right == null);
         }
     }
 

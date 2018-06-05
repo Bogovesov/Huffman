@@ -1,7 +1,5 @@
 package com.company;
 
-import java.io.IOException;
-
 public class Application {
 
     public static final String COMPRESS = "--compress";
@@ -25,7 +23,7 @@ public class Application {
             Compressor.instance().compress(fileName);
         } else if (mode.equals(DECOMPRESS)) {
             try {
-                Decompressor.instamce().decompress(fileName);
+                Decompressor.instance().decompress(fileName);
             } catch (UnexpectedFileFormat e) {
                 e.printStackTrace();
             }
