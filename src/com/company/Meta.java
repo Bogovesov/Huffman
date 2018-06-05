@@ -13,12 +13,14 @@ import static com.company.FileUtils.*;
 
 public class Meta {
 
+    public static final String SEPARATOR = ":";
+
     public static void write(String fileName, int[] frequecny) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for (int i = 0; i < frequecny.length; i++) {
                 if (frequecny[i] != 0) {
                     StringBuilder builder = new StringBuilder();
-                    builder.append(i).append(":").append(frequecny[i]).append("\n");
+                    builder.append(i).append(SEPARATOR).append(frequecny[i]).append("\n");
                     writer.write(builder.toString());
                 }
             }
@@ -35,7 +37,7 @@ public class Meta {
             final List<String> strings = Files.readAllLines(Paths.get(fileNameMeta));
             Map<Integer, String> codeTable = new HashMap<>();
             for (String str : strings) {
-                String[] pivot = str.split(":");
+                String[] pivot = str.split(SEPARATOR);
                 codeTable.put(Integer.valueOf(pivot[0]), pivot[1]);
             }
             for (int i = 0; i < frequecny.length; i++) {

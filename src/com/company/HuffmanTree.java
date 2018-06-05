@@ -3,12 +3,14 @@ package com.company;
 import java.util.*;
 
 public class HuffmanTree implements Comparable<HuffmanTree> {
+
+    public static final int SIZE_ARRAY_FREQUENCY = 255;
+
     /**
      * Корень дерева
      */
     private Node root;
-
-    private int[] frequency = new int[255];
+    private int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
 
     private HuffmanTree() {
     }
@@ -51,7 +53,7 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
      * Формирования таблицы повторяемости символов
      */
     public static int[] calculateFrequency(byte[] content) {
-        int[] frequency = new int[255];
+        int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
         for (int i = 0; i < content.length; i++) {
             byte letter = content[i];
             frequency[letter]++;

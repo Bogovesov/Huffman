@@ -6,6 +6,8 @@ import static com.company.FileUtils.*;
 
 public class Compressor {
 
+    private String fileName;
+
     private Compressor() {
 
     }
@@ -14,16 +16,28 @@ public class Compressor {
         return Singelton.INSTANCE.compressor;
     }
 
-    public void compress(String fileName) {
-        final byte[] content = readBytes(fileName);
+    public byte[] compress(String fileName) {
+        this.fileName = fileName;
+        return compress(readBytes(fileName));
+    }
+
+    public byte[] compress(byte[] content) {
         final HuffmanTree huffmanTree = HuffmanTree.buildTree(content);
         final String binaryString = huffmanTree.code(content);
 
-        Meta.write(fileName + EXT_META, huffmanTree.getFrequency());
-        writeBytes(fileName + EXT_COMPRESSED, splitStringToByte(binaryString));
+        final byte[] result = splitStringToByte(binaryString);
+        if (fileName != null) {
+            writeDataToFile(huffmanTree, result);
+        }
+        return result;
     }
 
-    private byte[] splitStringToByte(String inputString) {
+    private void writeDataToFile(HuffmanTree huffmanTree, byte[] result) {
+        Meta.write(fileName + EXT_META, huffmanTree.getFrequency());
+        writeBytes(fileName + EXT_COMPRESSED, result);
+    }
+
+    public byte[] splitStringToByte(String inputString) {
         final List<Byte> byteList = new ArrayList<>();
 
         int count = 0;
