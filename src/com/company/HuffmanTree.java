@@ -6,9 +6,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
 
     public static final int SIZE_ARRAY_FREQUENCY = 255;
 
-    /**
-     * Корень дерева
-     */
     private Node root;
     private int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
 
@@ -19,19 +16,10 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         this.root = root;
     }
 
-    /**
-     * Построение дерева Хаффмана
-     *
-     * @return дерево Хаффмана
-     */
     public static HuffmanTree buildTree(byte[] content) {
         return buildTree(calculateFrequency(content));
     }
 
-    /**
-     * Формирование дерева
-     * В последнем элементе будет корень дерева, который содержит ссылки на своих потомков
-     */
     public static HuffmanTree buildTree(int[] frequency) {
         Queue<HuffmanTree> huffmanQueue = new PriorityQueue<HuffmanTree>();
         for (int i = 0; i < frequency.length; i++) {
@@ -49,9 +37,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         return huffmanTree;
     }
 
-    /**
-     * Формирования таблицы повторяемости символов
-     */
     public static int[] calculateFrequency(byte[] content) {
         int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
         for (int i = 0; i < content.length; i++) {
@@ -83,11 +68,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         return Bytes.valueOf(byteList);
     }
 
-    /**
-     * Формирование закодированной строки
-     *
-     * @return Закодированнная строка
-     */
     public String code(byte[] content) {
         Map<Byte, String> codeTable = codeTable();
         StringBuilder result = new StringBuilder();
@@ -100,9 +80,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         return result.toString();
     }
 
-    /**
-     * Формирование кодовой таблицы
-     */
     private Map<Byte, String> codeTable() {
         Map<Byte, String> codeTable = new HashMap();
         codeTable(root, new StringBuilder(), codeTable);
@@ -120,9 +97,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         code.deleteCharAt(code.length() - 1);
     }
 
-    /**
-     * Для сортировки очереди по необходимому признаку
-     */
     @Override
     public int compareTo(HuffmanTree tree) {
         return root.frequency - tree.root.frequency;

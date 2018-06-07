@@ -29,7 +29,6 @@ public class FileUtils {
         }
     }
 
-    // TODO: реализовать проверку на валидность
     public static boolean isValidFormat(byte[] content) {
         return true;
     }
