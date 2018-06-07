@@ -8,6 +8,7 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
 
     private Node root;
     private int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
+    private int sizeContent;
 
     private HuffmanTree() {
     }
@@ -17,7 +18,9 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     }
 
     public static HuffmanTree buildTree(byte[] content) {
-        return buildTree(calculateFrequency(content));
+        HuffmanTree huffmanTree = buildTree(calculateFrequency(content));
+        huffmanTree.sizeContent = content.length;
+        return huffmanTree;
     }
 
     public static HuffmanTree buildTree(int[] frequency) {
@@ -46,57 +49,6 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         return frequency;
     }
 
-    public byte[] decode(byte[] content) {
-        List<Byte> byteList = new ArrayList<>();
-        Node node = root;
-        char buf;
-
-        for (int i = 0; i < content.length; i++) {
-            buf = (char) content[i];
-            for (int j = 0; j < 8; j++) {
-                if ((buf & (1 << (7 - j))) != 0) {
-                    node = node.right;
-                } else {
-                    node = node.left;
-                }
-                if (node.isLeaf()) {
-                    byteList.add(node.character);
-                    node = root;
-                }
-            }
-        }
-        return Bytes.valueOf(byteList);
-    }
-
-    public String code(byte[] content) {
-        Map<Byte, String> codeTable = codeTable();
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < content.length; i++) {
-            if (codeTable.containsKey(content[i])) {
-                result.append(codeTable.get(content[i]));
-            }
-        }
-        return result.toString();
-    }
-
-    private Map<Byte, String> codeTable() {
-        Map<Byte, String> mapCodeTable = new HashMap();
-        codeTable(root, new StringBuilder(), mapCodeTable);
-        return mapCodeTable;
-    }
-
-    private void codeTable(Node node, StringBuilder code, Map<Byte, String> codeTable) {
-        if (node.isLeaf()) {
-            codeTable.put(node.character, code.toString());
-            return;
-        }
-        codeTable(node.left, code.append('0'), codeTable);
-        code.deleteCharAt(code.length() - 1);
-        codeTable(node.right, code.append('1'), codeTable);
-        code.deleteCharAt(code.length() - 1);
-    }
-
     @Override
     public int compareTo(HuffmanTree tree) {
         return root.frequency - tree.root.frequency;
@@ -110,7 +62,15 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         return frequency;
     }
 
-    private static class Node {
+    public int getSizeContent() {
+        return sizeContent;
+    }
+
+    public Node getRoot() {
+        return root;
+    }
+
+    public static class Node {
         private int frequency;
         private byte character;
         private Node left;
@@ -129,6 +89,22 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
 
         public boolean isLeaf() {
             return (left == null) && (right == null);
+        }
+
+        public int getFrequency() {
+            return frequency;
+        }
+
+        public byte getCharacter() {
+            return character;
+        }
+
+        public Node getLeft() {
+            return left;
+        }
+
+        public Node getRight() {
+            return right;
         }
     }
 }

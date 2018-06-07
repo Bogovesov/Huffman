@@ -1,7 +1,4 @@
-import com.company.Compressor;
-import com.company.Decompressor;
-import com.company.FileUtils;
-import com.company.UnexpectedFileFormat;
+import com.company.*;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -20,7 +17,7 @@ public class CompressorTest {
     @Test
     public void testSplitStringToByte() {
         String str = "01011101";
-        byte[] actual = Compressor.instance().splitStringToByte(str);
+        byte[] actual = Spliter.splitStringToByte(str);
         byte[] expected = {93};
         assertEquals(actual[0], expected[0]);
     }

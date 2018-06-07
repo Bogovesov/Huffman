@@ -14,9 +14,13 @@ import static com.company.FileUtils.*;
 public class Meta {
 
     public static final String SEPARATOR = ":";
+    public static final String SECTION_SIZE_CONTENT = "size";
+    private static int sizeContent = 0;
 
-    public static void write(String fileName, int[] frequecny) {
+    public static void write(String fileName, int[] frequecny, int sizeContent) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write(SECTION_SIZE_CONTENT + SEPARATOR + sizeContent + "\n");
+
             for (int i = 0; i < frequecny.length; i++) {
                 if (frequecny[i] != 0) {
                     StringBuilder builder = new StringBuilder();
@@ -29,17 +33,22 @@ public class Meta {
         }
     }
 
-
     public static int[] read(String fileName) {
         final String fileNameMeta = fileName.replaceAll(EXT_COMPRESSED, EXT_META);
         int[] frequecny = new int[255];
         try {
             final List<String> strings = Files.readAllLines(Paths.get(fileNameMeta));
             Map<Integer, String> codeTable = new HashMap<>();
+
             for (String str : strings) {
                 String[] pivot = str.split(SEPARATOR);
-                codeTable.put(Integer.valueOf(pivot[0]), pivot[1]);
+                if (pivot[0].equals(SECTION_SIZE_CONTENT)) {
+                    sizeContent = Integer.valueOf(pivot[1]);
+                } else {
+                    codeTable.put(Integer.valueOf(pivot[0]), pivot[1]);
+                }
             }
+
             for (int i = 0; i < frequecny.length; i++) {
                 if (codeTable.containsKey(i)) {
                     frequecny[i] = Integer.parseInt(codeTable.get(i));
@@ -49,5 +58,9 @@ public class Meta {
             e.printStackTrace();
         }
         return frequecny;
+    }
+
+    public static int getSizeContent() {
+        return sizeContent;
     }
 }
