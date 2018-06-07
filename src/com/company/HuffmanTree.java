@@ -37,7 +37,7 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
         return huffmanTree;
     }
 
-    public static int[] calculateFrequency(byte[] content) {
+    private static int[] calculateFrequency(byte[] content) {
         int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
         for (int i = 0; i < content.length; i++) {
             byte letter = content[i];
@@ -81,9 +81,9 @@ public class HuffmanTree implements Comparable<HuffmanTree> {
     }
 
     private Map<Byte, String> codeTable() {
-        Map<Byte, String> codeTable = new HashMap();
-        codeTable(root, new StringBuilder(), codeTable);
-        return codeTable;
+        Map<Byte, String> mapCodeTable = new HashMap();
+        codeTable(root, new StringBuilder(), mapCodeTable);
+        return mapCodeTable;
     }
 
     private void codeTable(Node node, StringBuilder code, Map<Byte, String> codeTable) {
