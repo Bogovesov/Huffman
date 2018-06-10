@@ -7,7 +7,7 @@ import static junit.framework.Assert.*;
 
 public class CompressorTest {
     @Test
-    public void testCompressString() {
+    public void testIsCompressFile() {
         String fileName = "text.txt";
         byte[] actual = FileUtils.readBytes(fileName);
         byte[] compressed = Compressor.instance().compress(actual);
@@ -17,8 +17,8 @@ public class CompressorTest {
     @Test
     public void testSplitStringToByte() {
         String str = "01011101";
-        byte[] actual = Spliter.splitStringToByte(str);
-        byte[] expected = {93};
+        byte[] actual = Splitter.toBytes(str);
+        byte[] expected = {Byte.parseByte(str, 2)};
         assertEquals(actual[0], expected[0]);
     }
 

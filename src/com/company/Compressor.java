@@ -25,7 +25,7 @@ public class Compressor {
         final HuffmanTree huffmanTree = HuffmanTree.buildTree(content);
         final String binaryString = getBynaryString(content, huffmanTree);
 
-        final byte[] result = Spliter.splitStringToByte(binaryString);
+        final byte[] result = Splitter.toBytes(binaryString);
         if (fileName != null) {
             writeDataToFile(huffmanTree, result);
         }
