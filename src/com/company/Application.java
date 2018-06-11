@@ -2,15 +2,15 @@ package com.company;
 
 public class Application {
 
-    public static final String COMPRESS = "--compress";
-    public static final String DECOMPRESS = "--decompress";
+    private static final String COMPRESS = "--compress";
+    private static final String DECOMPRESS = "--decompress";
 
     private Application() {
 
     }
 
     public static Application instance() {
-        return Singelton.INSTANCE.application;
+        return Singleton.INSTANCE.application;
     }
 
     public void run(String[] args) {
@@ -19,9 +19,9 @@ public class Application {
         }
         final String fileName = args[0];
         final String mode = args[1];
-        if (mode.equals(COMPRESS)) {
+        if (COMPRESS.equals(mode)) {
             Compressor.instance().compress(fileName);
-        } else if (mode.equals(DECOMPRESS)) {
+        } else if (DECOMPRESS.equals(mode)) {
             try {
                 Decompressor.instance().decompress(fileName);
             } catch (UnexpectedFileFormat e) {
@@ -30,11 +30,11 @@ public class Application {
         }
     }
 
-    private enum Singelton {
+    private enum Singleton {
         INSTANCE;
-        private Application application;
+        private final Application application;
 
-        Singelton() {
+        Singleton() {
             application = new Application();
         }
     }

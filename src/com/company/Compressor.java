@@ -6,6 +6,8 @@ import static com.company.FileUtils.*;
 
 public class Compressor {
 
+    public static final int SIZE_ARRAY_FREQUENCY = 255;
+
     private String fileName;
 
     private Compressor() {
@@ -13,7 +15,7 @@ public class Compressor {
     }
 
     public static Compressor instance() {
-        return Singelton.INSTANCE.compressor;
+        return Singleton.INSTANCE.compressor;
     }
 
     public byte[] compress(String fileName) {
@@ -22,58 +24,73 @@ public class Compressor {
     }
 
     public byte[] compress(byte[] content) {
-        final HuffmanTree huffmanTree = HuffmanTree.buildTree(content);
-        final String binaryString = getBynaryString(content, huffmanTree);
+        final int[] frequency = calculateFrequency(content);
+        final BinaryNode root = HuffmanTree.buildTree(frequency);
+        final String binaryString = buildBinaryString(content, root);
 
         final byte[] result = Splitter.toBytes(binaryString);
         if (fileName != null) {
-            writeDataToFile(huffmanTree, result);
+            writeDataToFile(frequency, content.length, result);
         }
         return result;
     }
 
-    private void writeDataToFile(HuffmanTree huffmanTree, byte[] result) {
-        Meta.write(fileName + EXT_META, huffmanTree.getFrequency(), huffmanTree.getSizeContent());
+    private static int[] calculateFrequency(byte[] content) {
+        int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
+        for (int i = 0; i < content.length; i++) {
+            byte letter = content[i];
+            frequency[letter]++;
+        }
+        return frequency;
+    }
+
+    private void writeDataToFile(int[] frequency, int sizeContent, byte[] result) {
+        Meta.write(fileName + EXT_META, frequency, sizeContent);
         writeBytes(fileName + EXT_COMPRESSED, result);
     }
 
-    public String getBynaryString(byte[] content, HuffmanTree huffmanTree) {
-        Map<Byte, String> codeTable = codeTable(huffmanTree);
-        StringBuilder result = new StringBuilder();
+    public String buildBinaryString(byte[] content, BinaryNode root) {
+        final Map<Byte, String> codeTable = buildCodeTable(root);
+        final StringBuilder result = new StringBuilder();
 
         for (int i = 0; i < content.length; i++) {
             if (codeTable.containsKey(content[i])) {
                 result.append(codeTable.get(content[i]));
+            } else {
+                throw new IllegalStateException("Unexpected symbol");
             }
         }
         return result.toString();
     }
 
-    private Map<Byte, String> codeTable(HuffmanTree huffmanTree) {
-        Map<Byte, String> mapCodeTable = new HashMap();
-        codeTable(huffmanTree.getRoot(), new StringBuilder(), mapCodeTable);
-        return mapCodeTable;
+    private Map<Byte, String> buildCodeTable(BinaryNode root) {
+        final Map<Byte, String> codeTable = new HashMap<>();
+        buildCodeTable(root, new StringBuilder(), codeTable);
+        return codeTable;
     }
 
-    private void codeTable(HuffmanTree.Node node, StringBuilder code, Map<Byte, String> codeTable) {
+    private void buildCodeTable(BinaryNode node, StringBuilder code, Map<Byte, String> codeTable) {
+        if (node == null) {
+            return;
+        }
         if (node.isLeaf()) {
-            if (code.toString().isEmpty()) {
+            if (code.length() == 0) {
                 code.append('0');
             }
             codeTable.put(node.getCharacter(), code.toString());
             return;
         }
-        codeTable(node.getLeft(), code.append('0'), codeTable);
+        buildCodeTable(node.getLeft(), code.append('0'), codeTable);
         code.deleteCharAt(code.length() - 1);
-        codeTable(node.getRight(), code.append('1'), codeTable);
+        buildCodeTable(node.getRight(), code.append('1'), codeTable);
         code.deleteCharAt(code.length() - 1);
     }
 
-    private enum Singelton {
+    private enum Singleton {
         INSTANCE;
         private Compressor compressor;
 
-        Singelton() {
+        Singleton() {
             compressor = new Compressor();
         }
     }

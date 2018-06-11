@@ -1,6 +1,5 @@
 package com.company;
 
-import java.rmi.MarshalException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,25 +7,18 @@ import static com.company.FileUtils.*;
 
 public class Decompressor {
 
-    private String fileName;
-
     private Decompressor() {
 
     }
 
     public static Decompressor instance() {
-        return Singelton.INSTANCE.decompressor;
+        return Singleton.INSTANCE.decompressor;
     }
 
     public byte[] decompress(String fileName) throws UnexpectedFileFormat {
-        this.fileName = fileName;
-        return decompress(readBytes(fileName));
-    }
-
-    public byte[] decompress(byte[] content) throws UnexpectedFileFormat {
-        int[] frequency = Meta.read(fileName);
-        HuffmanTree huffmanTree = HuffmanTree.buildTree(frequency);
-        final byte[] decodeContent = decode(content, Meta.getSizeContent(), huffmanTree);
+        final byte[] content = readBytes(fileName);
+        final int[] frequency = Meta.read(fileName);
+        final byte[] decodeContent = decode(content, Meta.getSizeContent(), HuffmanTree.buildTree(frequency));
 
         if (!isValidFormat(decodeContent)) {
             throw new UnexpectedFileFormat();
@@ -35,9 +27,9 @@ public class Decompressor {
         return decodeContent;
     }
 
-    public byte[] decode(byte[] content, int sizeSourceContent, HuffmanTree huffmanTree) {
-        List<Byte> byteList = new ArrayList<>();
-        HuffmanTree.Node node = huffmanTree.getRoot();
+    private byte[] decode(byte[] content, int sizeSourceContent, BinaryNode node) {
+        final List<Byte> byteList = new ArrayList<>();
+        final BinaryNode root = node;
         char buf;
 
         for (int i = 0; i < content.length; i++) {
@@ -54,7 +46,7 @@ public class Decompressor {
                 }
                 if (node.isLeaf()) {
                     byteList.add(node.getCharacter());
-                    node = huffmanTree.getRoot();
+                    node = root;
                     if (byteList.size() == sizeSourceContent) {
                         break;
                     }
@@ -64,11 +56,11 @@ public class Decompressor {
         return Bytes.valueOf(byteList);
     }
 
-    private enum Singelton {
+    private enum Singleton {
         INSTANCE;
         private Decompressor decompressor;
 
-        Singelton() {
+        Singleton() {
             decompressor = new Decompressor();
         }
     }
