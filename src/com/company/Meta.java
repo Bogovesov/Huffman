@@ -13,8 +13,8 @@ import static com.company.FileUtils.*;
 
 public class Meta {
 
-    public static final String SEPARATOR = ":";
-    public static final String SECTION_SIZE_CONTENT = "size";
+    private static final String SEPARATOR = ":";
+    private static final String SECTION_SIZE_CONTENT = "size";
     private static int sizeContent = 0;
 
     public static void write(String fileName, int[] frequecny, int sizeContent) {

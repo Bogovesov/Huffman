@@ -6,8 +6,7 @@ import static com.company.FileUtils.*;
 
 public class Compressor {
 
-    public static final int SIZE_ARRAY_FREQUENCY = 255;
-
+    private static final int SIZE_ARRAY_FREQUENCY = 255;
     private String fileName;
 
     private Compressor() {
@@ -35,7 +34,7 @@ public class Compressor {
         return result;
     }
 
-    private static int[] calculateFrequency(byte[] content) {
+    private int[] calculateFrequency(byte[] content) {
         int[] frequency = new int[SIZE_ARRAY_FREQUENCY];
         for (int i = 0; i < content.length; i++) {
             byte letter = content[i];
@@ -49,7 +48,7 @@ public class Compressor {
         writeBytes(fileName + EXT_COMPRESSED, result);
     }
 
-    public String buildBinaryString(byte[] content, BinaryNode root) {
+    private String buildBinaryString(byte[] content, BinaryNode root) {
         final Map<Byte, String> codeTable = buildCodeTable(root);
         final StringBuilder result = new StringBuilder();
 
